@@ -28,8 +28,8 @@ contract Bid {
   constructor(Commons.PossibleEvent[] memory outerEvents, address allowedOracle) public {
     // cada evento ya tiene name y ratio definido
 
-    this.currentState = Commons.State.AcceptingBids;
-    this.oracle = allowedOracle;
+    currentState = Commons.State.AcceptingBids;
+    oracle = allowedOracle;
 
     for(uint i = 0; i < outerEvents.length; i++){
       Commons.PossibleEvent memory e = outerEvents[i];
@@ -40,7 +40,7 @@ contract Bid {
 
   function registerOcurredEvent(string memory name) public onlyOracle {
     require(events[name].name == name, "That event does not exist");
-    this.currentState = Commons.State.EventHappened;
+    currentState = Commons.State.EventHappened;
     ocurredEvent = name;
     uint256[] memory moneyOfFailedEvents = 0;
     uint256 moneyOfOcurredEvent;
