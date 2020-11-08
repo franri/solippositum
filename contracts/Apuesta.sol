@@ -19,11 +19,12 @@ contract Apuesta {
   mapping( uint256 => Apostado[] ) apuestas;
   mapping( uint256 => uint256 ) eventsIdx;
 
-  address payable organizador;
+  address payable public organizador;
   uint256 eventoGanador;
   address oraculo;
   
-  event Print(uint256 i);
+  //event Print(uint256 i);
+  //event Print(Apostado a);
 
   constructor(uint256[][] memory outerEvents) public {
     // outerEvents tiene en:
@@ -32,6 +33,7 @@ contract Apuesta {
     for (uint256 i = 0; i<outerEvents.length; i++){
       createEvent(i, outerEvents[i]);
     }
+    organizador = msg.sender;
   }
 
   function createEvent(uint256 i, uint256[] memory outerEvent) private {
@@ -61,9 +63,12 @@ contract Apuesta {
   function payback() private {
     Apostado[] storage a = getApuestasDeEvento(eventoGanador);
     // le pagamos a cada ganador
+    //emit Print(a.length);
     for(uint i = 0; i < a.length; i++){
       Apostado storage apostado = a[i];
-      apostado.apostador.transfer(apostado.cantidad * getEvento(eventoGanador).ratio);
+      //emit Print(apostado);
+      //emit Print(apostado.cantidad * getEvento(eventoGanador).ratio/10);
+      apostado.apostador.transfer(apostado.cantidad * getEvento(eventoGanador).ratio/10);
     }
     // le pagamos al organizador
     organizador.transfer(address(this).balance);
