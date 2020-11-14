@@ -15,13 +15,40 @@ contract Apuesta {
     address payable apostador;
   }
 
+  enum Estado {
+    ApuestasAbiertas,
+    ApuestasCerradas,
+    EventoRecibido,
+    PagosRealizados,
+    PagosNoRealizados
+  }
+
   Evento[] events;
   mapping( uint256 => Apostado[] ) apuestas;
   mapping( uint256 => uint256 ) eventsIdx;
 
   address payable public organizador;
-  uint256 eventoGanador;
   address oraculo;
+
+  
+  uint256 eventoGanador;
+  Estado estado;
+
+
+  modifier onlyOraculo() {
+    require(msg.sender == oraculo, "Sólo un oráculo puede realizar esta tarea.");
+    _;
+  }
+
+  modifier onlyApuestasAbiertas() {
+    require(estado == Estado.ApuestasAbiertas, "No se aceptan más apuestas.");
+    _;
+  }
+  modifier onlyApuestasCerradas() {
+    require(estado == Estado.ApuestasCerradas, "No se aceptan más apuestas.");
+    _;
+  }
+  
   
   //event Print(uint256 i);
   //event Print(Apostado a);
@@ -34,6 +61,7 @@ contract Apuesta {
       createEvent(i, outerEvents[i]);
     }
     organizador = msg.sender;
+    estado = Estado.ApuestasAbiertas;
   }
 
   function createEvent(uint256 i, uint256[] memory outerEvent) private {
@@ -46,7 +74,7 @@ contract Apuesta {
 
   }
 
-  function registerBid(uint256 idEvento) public payable {
+  function registerBid(uint256 idEvento) public payable onlyApuestasAbiertas {
     // address, que va a ser msg.sender
     // id 4437
     // plata, que va a ser msg.value
@@ -55,12 +83,22 @@ contract Apuesta {
     getApuestasDeEvento(idEvento).push(apuesta);
   }
 
-  function recibirEventoDelOraculo(uint256 eventoGanadorId) public {
-    eventoGanador = eventoGanadorId;
-    payback();
+  function cerrarApuestas() public onlyOraculo onlyApuestasAbiertas {
+    estado = Estado.ApuestasCerradas;
   }
 
-  function payback() private {
+  function recibirEventoDelOraculo(uint256 eventoGanadorId) public onlyOraculo onlyApuestasCerradas {
+    eventoGanador = eventoGanadorId;
+    if ( plataDelOrganizador > plataRequerida ) {
+      payBack();
+      estado = Estado.PagosRealizados;
+    } else {
+      reimburse();
+      estado = Estado.PagosNoRealizados;
+    }
+  }
+
+  function payBack() private {
     Apostado[] storage a = getApuestasDeEvento(eventoGanador);
     // le pagamos a cada ganador
     //emit Print(a.length);
@@ -72,6 +110,18 @@ contract Apuesta {
     }
     // le pagamos al organizador
     organizador.transfer(address(this).balance);
+  }
+
+  function reimburse() private {
+    for ( uint i = 0; i < events; i++ ){
+      Apostado[] apuestasDeEvento = getApuestasDeEvento(events[i].id);
+      for ( uint j = 0; j < apuestasDeEventos; j++ ){
+        Apostado a = apuestasDeEventos[j];
+        a.apostador.transfer(a.cantidad);
+      }
+    }
+    organizador.transfer(plataDelOrganizador);
+    assert(address(this).balance == 0, "Quedó plata sobrante. kehacemo.")
   }
 
   function getEvento(uint256 id) private view returns ( Evento storage ) {
