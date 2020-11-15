@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.22 <0.8.0;
+pragma solidity 0.6.0;
 pragma experimental ABIEncoderV2;
 
 contract Apuesta {
 
   struct Evento {
-    uint id;
-    uint ratio; // mutiplicado por 10, por ejemplo 14 es 1.4
-    uint cantidadApostada;
+    uint256 id;
+    uint256 ratio; // mutiplicado por 10, por ejemplo 14 es 1.4
+    uint256 cantidadApostada;
   }
 
   struct Apostado {
-    uint cantidad;
+    uint256 cantidad;
     address payable apostador;
   }
 
@@ -30,9 +30,12 @@ contract Apuesta {
   address payable public organizador;
   address oraculo;
 
-  
   uint256 eventoGanador;
   Estado estado;
+
+  mapping (uint256 => uint256) plataRequeridaPorApuesta;
+  uint256 plataRequerida;
+  uint256 plataDelOrganizador;
 
 
   modifier onlyOraculo() {
@@ -78,9 +81,18 @@ contract Apuesta {
     // address, que va a ser msg.sender
     // id 4437
     // plata, que va a ser msg.value
+
+    // registrar la apuesta
     Apostado memory apuesta = Apostado({cantidad: msg.value, apostador: msg.sender});
     getEvento(idEvento).cantidadApostada+=apuesta.cantidad;
     getApuestasDeEvento(idEvento).push(apuesta);
+
+    // actualizar plata requerida
+    plataRequeridaPorApuesta[idEvento]+=msg.value*(getEvento(idEvento).ratio)/10;
+    if (plataRequeridaPorApuesta[idEvento] > plataRequerida){
+      plataRequerida = plataRequeridaPorApuesta[idEvento];
+    }
+
   }
 
   function cerrarApuestas() public onlyOraculo onlyApuestasAbiertas {
@@ -113,15 +125,15 @@ contract Apuesta {
   }
 
   function reimburse() private {
-    for ( uint i = 0; i < events; i++ ){
-      Apostado[] apuestasDeEvento = getApuestasDeEvento(events[i].id);
-      for ( uint j = 0; j < apuestasDeEventos; j++ ){
-        Apostado a = apuestasDeEventos[j];
+    for ( uint i = 0; i < events.length; i++ ){
+      Apostado[] memory apuestasDeEvento = getApuestasDeEvento(events[i].id);
+      for ( uint j = 0; j < apuestasDeEvento.length; j++ ){
+        Apostado memory a = apuestasDeEvento[j];
         a.apostador.transfer(a.cantidad);
       }
     }
     organizador.transfer(plataDelOrganizador);
-    assert(address(this).balance == 0, "Quedó plata sobrante. kehacemo.")
+    assert(address(this).balance == 0); // quedó plata en el contrato
   }
 
   function getEvento(uint256 id) private view returns ( Evento storage ) {
@@ -138,5 +150,13 @@ contract Apuesta {
 
   function getEventoByIdx(uint256 i) public view returns ( Evento memory ){
     return events[i];
+  }
+
+  receive() external payable {
+     if (msg.sender == organizador){
+       plataDelOrganizador += msg.value;
+     } else {
+       revert();
+     }
   }
 }
