@@ -1,4 +1,5 @@
 const Apuesta = artifacts.require("Apuesta");
+const ApuestaManager = artifacts.require("ApuestaManager");
 // const Commons = artifacts.require("Commons");
 
 const events = [
@@ -8,5 +9,6 @@ const events = [
 
 module.exports = function(deployer) {
   deployer.deploy(Apuesta, "Partido", events, "0x19fE5F5728f52A71439De01170d47B2D1870967B");
+  deployer.deploy(ApuestaManager);
   // deployer.deploy(Commons);
 };

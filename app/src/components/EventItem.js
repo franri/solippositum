@@ -1,5 +1,4 @@
 import React from "react";
-import { newContextComponents } from "@drizzle/react-components";
 
 
 class EventItem extends React.Component {   

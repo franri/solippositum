@@ -1,8 +1,5 @@
 import React from "react";
-import { newContextComponents } from "@drizzle/react-components";
 import EventItem from "./EventItem";
-
-const { AccountData, ContractData, ContractForm } = newContextComponents;
 
 class ContratoApuestas extends React.Component {
     state = { dataKeyName: null , dataKeyEvents: null };
@@ -24,8 +21,8 @@ class ContratoApuestas extends React.Component {
             <h2>{contractName && contractName.value}</h2>
             {contractEvents &&
                 //console.log(contractEvents.value)
-                contractEvents.value.map((e) => (
-                    <EventItem e = {e}/>
+                contractEvents.value.map((e, i) => (
+                    <EventItem e = {e} key={i}/>
                 ))
             }
         </div>
@@ -35,7 +32,7 @@ class ContratoApuestas extends React.Component {
    
    export default ContratoApuestas
 
-{/* 
+/* 
 export default ({ drizzle, drizzleState }) => {
   // destructure drizzle and drizzleState from props
   return (
@@ -63,4 +60,4 @@ export default ({ drizzle, drizzleState }) => {
     </div>
   );
 };
-*/}
+*/

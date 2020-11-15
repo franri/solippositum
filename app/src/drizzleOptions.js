@@ -3,6 +3,7 @@ import Web3 from "web3";
 //import SimpleStorage from "./contracts/SimpleStorage.json";
 //import TutorialToken from "./contracts/TutorialToken.json";
 import Apuesta from "./contracts/Apuesta.json"
+import ApuestaManager from "./contracts/ApuestaManager.json"
 
 const options = {
   web3: {
@@ -10,7 +11,7 @@ const options = {
     customProvider: new Web3("ws://localhost:7545"),
   },
   //contracts: [SimpleStorage, ComplexStorage, TutorialToken],
-  contracts: [Apuesta],
+  contracts: [Apuesta, ApuestaManager],
   /*events: {
     SimpleStorage: ["StorageSet"],
   },*/

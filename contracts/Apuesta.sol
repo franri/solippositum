@@ -170,4 +170,8 @@ contract Apuesta {
        revert();
      }
   }
+
+  function cambiarNombre(string memory name) public {
+    nombre = name;
+  }
 }
