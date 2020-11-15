@@ -23,18 +23,19 @@ contract Apuesta {
     PagosNoRealizados
   }
 
-  Evento[] events;
+  Evento[] public events;
   mapping( uint256 => Apostado[] ) apuestas;
   mapping( uint256 => uint256 ) eventsIdx;
 
+  string public nombre;
   address payable public organizador;
   address oraculo;
 
   uint256 eventoGanador;
-  Estado estado;
+  Estado public estado;
 
   mapping (uint256 => uint256) plataRequeridaPorApuesta;
-  uint256 plataRequerida;
+  uint256 public plataRequerida;
   uint256 plataDelOrganizador;
 
 
@@ -56,14 +57,16 @@ contract Apuesta {
   //event Print(uint256 i);
   //event Print(Apostado a);
 
-  constructor(uint256[][] memory outerEvents) public {
+  constructor(string memory name, uint256[][] memory outerEvents, address oraculoExterno) public {
     // outerEvents tiene en:
     //        0: id 4437
     //        1: ratio
     for (uint256 i = 0; i<outerEvents.length; i++){
       createEvent(i, outerEvents[i]);
     }
+    nombre = name;
     organizador = msg.sender;
+    oraculo = oraculoExterno;
     estado = Estado.ApuestasAbiertas;
   }
 
@@ -150,6 +153,14 @@ contract Apuesta {
 
   function getEventoByIdx(uint256 i) public view returns ( Evento memory ){
     return events[i];
+  }
+
+  function eventsLength() public view returns ( uint ) {
+    return events.length;
+  }
+
+  function getEvents() public view returns ( Evento[] memory ){
+    return events;
   }
 
   receive() external payable {
