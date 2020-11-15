@@ -7,6 +7,6 @@ const events = [
 ];
 
 module.exports = function(deployer) {
-  deployer.deploy(Apuesta, events);
+  deployer.deploy(Apuesta, "partido", events, "0xdc18d13e7D5AE14350f9642919CB990082204B74");
   // deployer.deploy(Commons);
 };

@@ -4,6 +4,7 @@ import logo from "./logo.png";
 
 const { AccountData, ContractData, ContractForm } = newContextComponents;
 
+
 export default ({ drizzle, drizzleState }) => {
   // destructure drizzle and drizzleState from props
   return (
@@ -14,8 +15,9 @@ export default ({ drizzle, drizzleState }) => {
         <p>
           Examples of how to get started with Drizzle in various situations.
         </p>
+        
       </div>
-
+      
       <div className="section">
         <h2>Active Account</h2>
         <AccountData
@@ -27,6 +29,39 @@ export default ({ drizzle, drizzleState }) => {
         />
       </div>
 
+
+      <div className="section">
+        <h2>Apuestas</h2>
+        <p>
+          <strong>Organizer address: </strong>
+          <ContractData
+            drizzle={drizzle}
+            drizzleState={drizzleState}
+            contract="Apuesta"
+            method="organizador"
+          />
+        </p>
+        <p>
+          <strong>Eventos: </strong>
+        </p>
+          <ul>
+          <ContractData
+            drizzle={drizzle}
+            drizzleState={drizzleState}
+            contract="Apuesta"
+            method="getEvents"
+          />
+          </ul>
+        
+        
+      </div>
+      
+
+
+
+
+
+      {/*
       <div className="section">
         <h2>SimpleStorage</h2>
         <p>
@@ -44,7 +79,8 @@ export default ({ drizzle, drizzleState }) => {
         </p>
         <ContractForm drizzle={drizzle} contract="SimpleStorage" method="set" />
       </div>
-
+      */}
+      {/*
       <div className="section">
         <h2>TutorialToken</h2>
         <p>
@@ -88,7 +124,8 @@ export default ({ drizzle, drizzleState }) => {
           labels={["To Address", "Amount to Send"]}
         />
       </div>
-
+      */}
+      {/*
       <div className="section">
         <h2>ComplexStorage</h2>
         <p>
@@ -124,6 +161,7 @@ export default ({ drizzle, drizzleState }) => {
           method="singleDD"
         />
       </div>
+      */}
     </div>
   );
 };
