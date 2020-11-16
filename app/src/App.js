@@ -20,7 +20,8 @@ const App = () => {
           }
 
           return (
-            <ApuestaManager drizzle={drizzle} drizzleState={drizzleState}/>
+            //<ApuestaManager drizzle={drizzle} drizzleState={drizzleState}/>
+            <ContratoApuestas drizzle={drizzle} drizzleState={drizzleState}/>
           )
         }}
       </DrizzleContext.Consumer>

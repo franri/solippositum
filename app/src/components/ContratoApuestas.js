@@ -1,5 +1,8 @@
 import React from "react";
+import { newContextComponents } from "@drizzle/react-components";
 import EventItem from "./EventItem";
+
+const { ContractForm } = newContextComponents;
 
 class ContratoApuestas extends React.Component {
     state = { dataKeyName: null , dataKeyEvents: null };
@@ -16,15 +19,25 @@ class ContratoApuestas extends React.Component {
       const { Apuesta } = this.props.drizzleState.contracts;
       const contractName = Apuesta.nombre[this.state.dataKeyName]; // if displayData (an object) exists, then we can display the value below
       const contractEvents = Apuesta.getEvents[this.state.dataKeyEvents]; // if displayData (an object) exists, then we can display the value below
+      //console.log({from:this.props.drizzleState});
+      //console.log(Apuesta);
       return (
         <div className="App">
             <h2>{contractName && contractName.value}</h2>
             {contractEvents &&
-                //console.log(contractEvents.value)
+                //console.log(contractEvents)
                 contractEvents.value.map((e, i) => (
                     <EventItem e = {e} key={i}/>
                 ))
             }
+            <h3>Apostar</h3>
+            <ContractForm
+              drizzle = {this.props.drizzle}
+              contract="Apuesta"
+              method="registerBid"
+              sendArgs={{from:this.props.drizzleState.accounts[0], value:2000000000000}}
+              labels={["Evento"]}
+            />
         </div>
       )
     }
@@ -32,7 +45,7 @@ class ContratoApuestas extends React.Component {
    
    export default ContratoApuestas
 
-/* 
+{/* 
 export default ({ drizzle, drizzleState }) => {
   // destructure drizzle and drizzleState from props
   return (
@@ -60,4 +73,4 @@ export default ({ drizzle, drizzleState }) => {
     </div>
   );
 };
-*/
+*/}
