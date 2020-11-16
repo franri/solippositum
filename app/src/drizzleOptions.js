@@ -6,15 +6,16 @@ import Apuesta from "./contracts/Apuesta.json"
 import ApuestaManager from "./contracts/ApuestaManager.json"
 
 const options = {
-  web3: {
-    block: false,
-    customProvider: new Web3("ws://localhost:7545"),
-  },
+  //web3: {
+  //  block: false,
+  //  customProvider: new Web3("ws://localhost:7545"),
+  //},
   //contracts: [SimpleStorage, ComplexStorage, TutorialToken],
-  contracts: [Apuesta, ApuestaManager],
+  contracts: [Apuesta, ApuestaManager], //
   /*events: {
     SimpleStorage: ["StorageSet"],
   },*/
 };
+
 
 export default options;
