@@ -1,10 +1,16 @@
 import React from "react";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route
+} from "react-router-dom"
 import { DrizzleContext } from "@drizzle/react-plugin";
 import { Drizzle } from "@drizzle/store";
 import drizzleOptions from "./drizzleOptions";
 //import MyComponent from "./MyComponent";
-import ContratoApuestas from "./components/ContratoApuestas";
-import ApuestaManager from './ApuestaManager/ApuestaManager'
+import ContratoApuestas from "./components/ContratoApuestas/ContratoApuestas";
+import ApuestaManager from './components/ApuestaManager/ApuestaManager'
+import Banner from './components/Banner/Banner'
 import "./App.css";
 
 const drizzle = new Drizzle(drizzleOptions);
@@ -18,10 +24,21 @@ const App = () => {
           if (!initialized) {
             return "Loading..."
           }
-
+      if (!drizzle || !drizzleState){
+        return <p>Loading...</p>
+      }
           return (
-             //<ApuestaManager drizzle={drizzle} drizzleState={drizzleState}/>
-            <ContratoApuestas drizzle={drizzle} drizzleState={drizzleState}/>
+            <span className="App">
+              <Banner/>
+              <Router>
+                <Switch>
+                  <Route path="/Apuesta/:contractAddress"  render={(props) => <ContratoApuestas props={props} drizzle={drizzle} drizzleState={drizzleState}/>}/>
+                  <Route path={["/","/ApuestaManager"]}>
+                    <ApuestaManager drizzle={drizzle} drizzleState={drizzleState}/>
+                  </Route>
+              </Switch>
+              </Router>
+            </span>
           )
         }}
       </DrizzleContext.Consumer>

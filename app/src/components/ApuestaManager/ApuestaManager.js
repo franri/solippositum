@@ -1,7 +1,5 @@
 import React  from 'react';
-
-import Apuesta from "./../contracts/Apuesta.json"
-
+import {Link} from "react-router-dom";
 
 class ApuestaManager extends React.Component{
 
@@ -14,44 +12,39 @@ class ApuestaManager extends React.Component{
         this.state = { lengthId, apuestasId, managedInstances: new Set() }
     }
 
-    addNewContract = (newAddress) => {
 
-        let contractName = "Apuesta " + newAddress;
-        let web3 = this.props.drizzle.web3;
+    addNewContract = (newAddress) => {
         if (this.state.managedInstances.has(newAddress)){
             return;
         }
         this.state.managedInstances.add(newAddress);
-        let web3Contract = new web3.eth.Contract(Apuesta.abi, newAddress) //second argument is new contract's address 
-                                                  
-        let contractConfig = { contractName, web3Contract }
-        //let events = ['LogFundingReceived']
-      
-        // Using the Drizzle context object
-        this.props.drizzle.addContract(contractConfig/*, events*/)
-        console.log(this.props.drizzle.contracts);
       }
 
-    componentDidMount(){
-        
+    componentDidUpdate(){
+        const { ApuestaManager } = this.props.drizzleState.contracts;
+        let addresses = ApuestaManager.getApuestas[this.state.apuestasId];
+        // console.log("componentDidUpdate");
+        // console.log(addresses);
+        let setAntes = [...this.state.managedInstances].sort().toString();
+        if (addresses){
+            addresses.value.forEach(addr => {
+                this.addNewContract(addr);
+            });
+            let setDespues = [...this.state.managedInstances].sort().toString();
+            if (setAntes !== setDespues)
+                this.forceUpdate();
+        }
     }
 
     render() {
-        const { ApuestaManager } = this.props.drizzleState.contracts;
-
-        let addresses = ApuestaManager.getApuestas[this.state.apuestasId];
-        
-        if (addresses){
-            addresses.value.forEach(addr => this.addNewContract(addr));
-        }
-
         let addressesA = [...this.state.managedInstances].sort();
-
         return <ul>
-            <li>hola</li>
             { addressesA && 
             addressesA.map((addr, idx)=>{
-                return <li key={idx} > {addr} </li>
+                return <li key={idx} > 
+                    <Link to={{ pathname: `/Apuesta/${addr}` }}>{addr}</Link>
+                    {/* <ContratoApuestas drizzle={drizzle} drizzleState={drizzleState} contractAddress={addr}/> */}
+                </li>
             })
             }
             </ul>

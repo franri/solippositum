@@ -1,0 +1,35 @@
+@import url("./../../App.css");
+
+.wrapper {
+    background: var(--orange);
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    align-items: center;
+}
+@media (min-width: 1212px) {
+    .wrapper {
+        flex-direction: row;
+        justify-content: left;    
+    }
+  }
+
+.title {
+    font-size: 3em;
+    font-weight: 600;
+    color: var(--blue);
+}
+.wrapper>*{
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
+    margin-right: 1em;
+    margin-left: 1em;
+}
+
+.subtitle {
+    font-size: 2em;
+    font-weight: 600;
+    color: var(--white);
+
+}

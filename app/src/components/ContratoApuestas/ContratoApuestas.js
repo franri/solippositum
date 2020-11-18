@@ -1,34 +1,72 @@
 import React from "react";
-import { newContextComponents } from "@drizzle/react-components";
 import EventItem from "./EventItem";
 
-const { ContractForm } = newContextComponents;
+import Apuesta from "../../contracts/Apuesta.json";
 
 class ContratoApuestas extends React.Component {
-    state = { dataKeyName: null , dataKeyEvents: null, amountToBet:'', selection:'' };
+    state = { dataKeyName: null , dataKeyEvents: null, amountToBet:'', selection:''};
     handleChangeAmount = this.handleChangeAmount.bind(this);
     handleChangeSelection = this.handleChangeSelection.bind(this);
 
 
-    componentDidMount() {
-      const { drizzle } = this.props;
-      const contract = drizzle.contracts.Apuesta;
-      let dataKeyName = contract.methods["nombre"].cacheCall(); // declare this call to be cached and synchronized
-      let dataKeyEvents = contract.methods["getEvents"].cacheCall(); // declare this call to be cached and synchronized
-      this.setState({ dataKeyName, dataKeyEvents });
+    constructor(props) {
+      super();
+      console.log(props);
+      this.props = props;
+      const { drizzle } = props;
+      const { contractAddress } = props.props.match.params;
+      if (drizzle && !drizzle.contracts["Apuesta "+contractAddress])
+        this.addNewContract(contractAddress);
     }
+
     handleChangeAmount(event) {
       this.setState({amountToBet: event.target.value});
       console.log(event.target.value);
     }
+
     handleChangeSelection(event) {
       this.setState({selection: event.target.value});
       //console.log(event.target.value);
     }
+
+ 
+
+    addNewContract(newAddress){
+      let contractName = "Apuesta " + newAddress;
+      const { drizzle  } = this.props;
+      let web3 = drizzle.web3;
+      let web3Contract = new web3.eth.Contract(Apuesta.abi, newAddress) //second argument is new contract's address 
+                                                
+      let contractConfig = { contractName, web3Contract }
+      //let events = ['LogFundingReceived']
+    
+      // Using the Drizzle context object
+      drizzle.addContract(contractConfig/*, events*/)
+      console.log("antes de timeout");
+      setTimeout(()=>{
+        const contract = drizzle.contracts[contractName];
+        let dataKeyName = contract.methods["nombre"].cacheCall(); // declare this call to be cached and synchronized
+        let dataKeyEvents = contract.methods["getEvents"].cacheCall(); // declare this call to be cached and synchronized
+        this.setState({ dataKeyName, dataKeyEvents });
+       }, 100)
+      
+    }
+
     render() {
-      const { Apuesta } = this.props.drizzleState.contracts;
-      const contractName = Apuesta.nombre[this.state.dataKeyName]; // if displayData (an object) exists, then we can display the value below
-      const contractEvents = Apuesta.getEvents[this.state.dataKeyEvents]; // if displayData (an object) exists, then we can display the value below
+      
+      const { drizzle, drizzleState } = this.props;
+      if (!drizzle || !drizzleState){
+        return <p>Loading...</p>
+      }
+      const { contractAddress } = this.props.props.match.params;
+      console.log(contractAddress);
+      const contract = drizzleState.contracts["Apuesta "+contractAddress];
+      console.log(contract);
+      if(!contract){
+        return <p>Loading...</p>
+      }
+      const contractName = contract.nombre && contract.nombre[this.state.dataKeyName]; // if displayData (an object) exists, then we can display the value below
+      const contractEvents = contract.getEvents && contract.getEvents[this.state.dataKeyEvents]; // if displayData (an object) exists, then we can display the value below
       //console.log({from:this.props.drizzleState});
       //console.log(Apuesta);
       return (
