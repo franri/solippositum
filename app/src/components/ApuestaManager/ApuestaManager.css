@@ -1,0 +1,52 @@
+@import url("./../../App.css");
+
+.bg {
+    background-color: var(--grey);
+}
+
+.addresses {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+}
+
+.addresses>ul {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-self: center;
+    padding: 1em;
+    max-width: 600px;
+    list-style-type: none;
+}
+
+.addresses>ul>li {
+    background-color: var(--blue);
+    padding: 0.5em;
+    margin-bottom: 1em;
+    transition: transform 0.2s ease;
+}
+.addresses>ul>li:hover {
+    transform: scaleX(1.1) scaleY(1.1);
+}
+.addresses>ul>li a {
+    color: var(--white);
+    text-decoration: none; /* no underline */
+  }
+
+.newBidForm {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.newBidForm>div{
+    width: 600px;
+    display: flex;
+    flex-direction: column;
+}
+.newBidForm>div>div>span{
+    display: inline-block;
+    width: 50%;
+}

@@ -40,9 +40,13 @@ class ContratoApuestas extends React.Component {
     }
 
     handleSubmitBet(event) {
+      console.log(this.state.amountToBet);
+      console.log(this.state.selection);
       var state = this.props.drizzle.store.getState()
       //console.log(this.props.drizzleState.accounts[0]);
-      const stackId = this.props.drizzle.contracts.Apuesta.methods.registerBid.cacheSend(this.state.selection, {from: this.props.drizzleState.accounts[0], value:this.state.amountToBet})
+      
+      const { contractAddress } = this.props.props.match.params;
+      const stackId = this.props.drizzle.contracts["Apuesta "+contractAddress].methods.registerBid.cacheSend(this.state.selection, {from: this.props.drizzleState.accounts[0], value:this.state.amountToBet})
 
       if (state.drizzleStatus.initialized) {
         // Use the stackId to display the transaction status.
@@ -103,7 +107,7 @@ class ContratoApuestas extends React.Component {
       return (
         <div className="App">
             <h2>{contractName && contractName.value}</h2>
-            <h5>Address: {this.props.drizzle.contracts.Apuesta.address}</h5>
+            <h5>Address: {this.props.props.match.params.contractAddress}</h5>
             <h5>Total apostado:
             {contractEvents && contractEvents.value.reduce((total, value) => {
               // if the value is an array then recursively call reduce

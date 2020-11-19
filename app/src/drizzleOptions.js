@@ -10,7 +10,7 @@ const options = {
   //  customProvider: new Web3("ws://localhost:7545"),
   //},
   //contracts: [SimpleStorage, ComplexStorage, TutorialToken],
-  contracts: [Apuesta, ApuestaManager], //
+  contracts: [ApuestaManager], //
   /*events: {
     SimpleStorage: ["StorageSet"],
   },*/
