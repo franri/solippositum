@@ -13,7 +13,8 @@ class ContratoApuestas extends React.Component {
 
     componentDidMount() {
       const { drizzle } = this.props;
-      const contract = drizzle.contracts.Apuesta;
+      const { contractAddress } = this.props.props.match.params;
+      const contract = drizzle.contracts["Apuesta "+contractAddress];
       let dataKeyName = contract.methods["nombre"].cacheCall(); // declare this call to be cached and synchronized
       let dataKeyEvents = contract.methods["getEvents"].cacheCall(); // declare this call to be cached and synchronized
       this.setState({ dataKeyName, dataKeyEvents });
