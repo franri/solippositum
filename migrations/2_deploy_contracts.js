@@ -8,7 +8,7 @@ const events = [
 ];
 
 module.exports = function(deployer) {
-  deployer.deploy(Apuesta, "Partido", events, "0xCD4F50983939b2C6EF91EfD6d4d9baB42d673D6c");
+  deployer.deploy(Apuesta, "Partido", events, "0xd574B00686bE215F307BD64d761fF1F34352FB6c");
   deployer.deploy(ApuestaManager);
   // deployer.deploy(Commons);
 };
