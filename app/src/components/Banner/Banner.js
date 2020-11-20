@@ -5,7 +5,7 @@ const Banner = () => {
     return(
         <div className="wrapper">
             <span className="title">Solippositum</span>
-            <span className="subtitle">Organice sus apuestas con la seguridad de Ethereum</span>
+            <span className="subtitle" style={{"font-size":"22px"}}>Sistema de apuestas descentralizado basado en Ethereum</span>
         </div>
     );
 

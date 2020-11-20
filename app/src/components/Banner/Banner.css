@@ -22,9 +22,9 @@
 }
 .wrapper>*{
     padding-top: 0.25em;
-    padding-bottom: 0.25em;
     margin-right: 1em;
     margin-left: 1em;
+    margin-bottom: .25em;
 }
 
 .subtitle {
