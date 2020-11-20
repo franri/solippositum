@@ -94,28 +94,28 @@ class ApuestaManager extends React.Component{
                     <div className="newBidForm">
                         <h3>Crear apuesta</h3>
                         <div>
-                            <div>
+                            <div style={{"margin" : "5px"}}>
                                 <span>Nombre de la apuesta </span>
                                 <input type="text" value={this.state.nombre} onChange={this.handleName} />
                             </div>
-                            <div>
+                            <div style={{"margin" : "5px"}}>
                                 <span>Oráculo </span>
                                 <input type="text" value={this.state.oraculo} onChange={this.handleOracle} />     
                             </div>
-                            <div>
+                            <div style={{"margin" : "5px"}}>
                                 <span>Id evento </span>
                                 <input type="text" value={this.state.id} onChange={this.handleEventId} />
                             </div>
-                            <div>
+                            <div style={{"margin" : "5px"}}>
                                 <span>Ratio evento </span>
                                 <input type="text" value={this.state.ratio} onChange={this.handleEventRatio} />         
                             </div>
-                            <button onClick={this.handleEventAdd}>Agregar evento</button>
+                            <button style={{"margin" : "5px"}} onClick={this.handleEventAdd}>Agregar evento</button>
                             <h3>Eventos:</h3>
                             <ul>
-                                {this.state.events && this.state.events.map((e, i)=><li key={i}>id {e[0]}, ratio {e[1]}</li>)}
+                                {this.state.events && this.state.events.map((e, i)=><li style={{"margin" : "5px"}} key={i}>id {e[0]}, ratio {e[1]}</li>)}
                             </ul>
-                            <button onClick={this.handleSubmit}>Crear apuesta</button>
+                            <button style={{"margin" : "5px"}} onClick={this.handleSubmit}>Crear apuesta</button>
                         </div>
                     </div>
                     </div>
