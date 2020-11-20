@@ -4,6 +4,8 @@ pragma experimental ABIEncoderV2;
 
 contract Apuesta {
 
+  event Print(uint256 p);
+
   struct Evento {
     uint256 id;
     uint256 ratio; // mutiplicado por 10, por ejemplo 14 es 1.4
@@ -29,15 +31,20 @@ contract Apuesta {
 
   string public nombre;
   address payable public organizador;
-  address oraculo;
+  address public oraculo;
 
-  uint256 eventoGanador;
+  uint256 public eventoGanador;
   Estado public estado;
 
   mapping (uint256 => uint256) plataRequeridaPorApuesta;
   uint256 public plataRequerida;
-  uint256 plataDelOrganizador;
+  uint256 public plataDelOrganizador;
 
+
+  modifier onlyOrganizador() {
+      require(msg.sender == organizador, "Sólo un oráculo puede realizar esta tarea.");
+      _;
+    }
 
   modifier onlyOraculo() {
     require(msg.sender == oraculo, "Sólo un oráculo puede realizar esta tarea.");
@@ -49,7 +56,7 @@ contract Apuesta {
     _;
   }
   modifier onlyApuestasCerradas() {
-    require(estado == Estado.ApuestasCerradas, "No se aceptan más apuestas.");
+    require(estado == Estado.ApuestasCerradas, "Sólo correr luego de cerrar las apuestas.");
     _;
   }
   
@@ -87,15 +94,20 @@ contract Apuesta {
 
     // registrar la apuesta
     Apostado memory apuesta = Apostado({cantidad: msg.value, apostador: msg.sender});
-    getEvento(idEvento).cantidadApostada+=apuesta.cantidad;
-    getApuestasDeEvento(idEvento).push(apuesta);
+    events[eventsIdx[idEvento]].cantidadApostada+=apuesta.cantidad;
+    apuestas[eventsIdx[idEvento]].push(apuesta);
+
+    emit Print(msg.value);
+    emit Print(apuesta.cantidad);
+    emit Print(plataRequeridaPorApuesta[idEvento]);
 
     // actualizar plata requerida
-    plataRequeridaPorApuesta[idEvento]+=msg.value*(getEvento(idEvento).ratio)/10;
+    plataRequeridaPorApuesta[idEvento]+=(msg.value*(events[eventsIdx[idEvento]].ratio)/10);
+    emit Print(plataRequeridaPorApuesta[idEvento]);
     if (plataRequeridaPorApuesta[idEvento] > plataRequerida){
       plataRequerida = plataRequeridaPorApuesta[idEvento];
     }
-
+    emit Print(plataRequeridaPorApuesta[idEvento]);
   }
 
   function cerrarApuestas() public onlyOraculo onlyApuestasAbiertas {
@@ -114,14 +126,14 @@ contract Apuesta {
   }
 
   function payBack() private {
-    Apostado[] storage a = getApuestasDeEvento(eventoGanador);
+    Apostado[] storage a = apuestas[eventsIdx[eventoGanador]];
     // le pagamos a cada ganador
     //emit Print(a.length);
     for(uint i = 0; i < a.length; i++){
       Apostado storage apostado = a[i];
       //emit Print(apostado);
       //emit Print(apostado.cantidad * getEvento(eventoGanador).ratio/10);
-      apostado.apostador.transfer(apostado.cantidad * getEvento(eventoGanador).ratio/10);
+      apostado.apostador.transfer(apostado.cantidad * events[eventsIdx[eventoGanador]].ratio/10);
     }
     // le pagamos al organizador
     organizador.transfer(address(this).balance);
@@ -129,7 +141,7 @@ contract Apuesta {
 
   function reimburse() private {
     for ( uint i = 0; i < events.length; i++ ){
-      Apostado[] memory apuestasDeEvento = getApuestasDeEvento(events[i].id);
+      Apostado[] memory apuestasDeEvento = apuestas[eventsIdx[events[i].id]];
       for ( uint j = 0; j < apuestasDeEvento.length; j++ ){
         Apostado memory a = apuestasDeEvento[j];
         a.apostador.transfer(a.cantidad);
@@ -143,7 +155,7 @@ contract Apuesta {
     return events[eventsIdx[id]];
   }
 
-  function getApuestasDeEvento(uint256 id) private view returns ( Apostado[] storage ) {
+  function getApuestasDeEvento(uint256 id) public view returns ( Apostado[] memory ) {
     return apuestas[eventsIdx[id]];
   }
 
@@ -164,14 +176,27 @@ contract Apuesta {
   }
 
   receive() external payable {
-     if (msg.sender == organizador){
-       plataDelOrganizador += msg.value;
-     } else {
-       revert();
-     }
+    if (msg.sender == organizador){
+      plataDelOrganizador += msg.value;
+    } else {
+      revert();
+    }
+  }
+  function deposit() public payable onlyOrganizador {
+    plataDelOrganizador += msg.value;
   }
 
   function cambiarNombre(string memory name) public {
     nombre = name;
+  }
+
+  function getPlatasRequeridas() public view returns ( uint256[][] memory ) {
+    uint256[][] memory a = new uint256[][](events.length);
+    for ( uint i = 0; i < events.length; i++ ){
+      uint256[] memory b = new uint256[](2);
+      b[0] = events[i].id;
+      b[1] = plataRequeridaPorApuesta[events[i].id];
+      a[i] = b;
+    }
   }
 }

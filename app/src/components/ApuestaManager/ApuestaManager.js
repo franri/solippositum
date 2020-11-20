@@ -11,7 +11,7 @@ class ApuestaManager extends React.Component{
         const contract = drizzle.contracts.ApuestaManager;
         let lengthId = contract.methods["apuestasLength"].cacheCall();
         let apuestasId = contract.methods["getApuestas"].cacheCall();
-        this.state = { lengthId, apuestasId, managedInstances: new Set(), events: [] }
+        this.state = { lengthId, apuestasId, managedInstances: {}, events: [] , nombre: '', id: '', ratio: '', oraculo: ''}
 
         
         this.handleName = this.handleName.bind(this);
@@ -23,24 +23,24 @@ class ApuestaManager extends React.Component{
     }
 
 
-    addNewContract = (newAddress) => {
-        if (this.state.managedInstances.has(newAddress)){
+    addNewContract = (dupla) => {
+        if (this.state.managedInstances[dupla.addr]){
             return;
         }
-        this.state.managedInstances.add(newAddress);
+        this.state.managedInstances[dupla.addr] = dupla;
       }
 
     componentDidUpdate(){
         const { ApuestaManager } = this.props.drizzleState.contracts;
-        let addresses = ApuestaManager.getApuestas[this.state.apuestasId];
+        let duplas = ApuestaManager.getApuestas[this.state.apuestasId];
         // console.log("componentDidUpdate");
         // console.log(addresses);
-        let setAntes = [...this.state.managedInstances].sort().toString();
-        if (addresses){
-            addresses.value.forEach(addr => {
-                this.addNewContract(addr);
+        let setAntes = Object.keys(this.state.managedInstances).map(k=>this.state.managedInstances[k]).map(e=>e.addr).sort().toString();
+        if (duplas){
+            duplas.value.forEach(dupla => {
+                this.addNewContract(dupla);
             });
-            let setDespues = [...this.state.managedInstances].sort().toString();
+            let setDespues = Object.keys(this.state.managedInstances).map(k=>this.state.managedInstances[k]).map(e=>e.addr).sort().toString();
             if (setAntes !== setDespues)
                 this.forceUpdate();
         }
@@ -62,23 +62,29 @@ class ApuestaManager extends React.Component{
         let ev = [parseInt(this.state.id), parseInt(this.state.ratio)];
         let prevEvents = this.state.events;
         prevEvents.push(ev);
-        console.log(prevEvents);
         this.setState({id: "", ratio: "", events: prevEvents})
     }
     handleSubmit(event){
-        console.log(this.state);
+        console.log(this.props);
+        const { drizzle, drizzleState } = this.props;
+
+        drizzle.contracts.ApuestaManager.methods.createApuesta.cacheSend(this.state.nombre, this.state.events, this.state.oraculo, {from: drizzleState.accounts[0]});
+        
     }
 
     render() {
-        let addressesA = [...this.state.managedInstances].sort();
+        let duplas = Object.keys(this.state.managedInstances).map(k=>this.state.managedInstances[k]).sort((a, b) => a.name > b.name);
         return <>
                 <div className="bg">
                     <div className="addresses">
                         <ul>
-                        { addressesA && 
-                        addressesA.map((addr, idx)=>{
+                        { duplas && 
+                        duplas.map((d, idx)=>{
                             return <li key={idx} > 
-                                <Link to={{ pathname: `/Apuesta/${addr}` }}>{addr}</Link>
+                                <span>{d.name}</span>
+                                <Link to={{ pathname: `/Apuesta/${d.addr}` }}> apostador</Link>
+                                <Link to={{ pathname: `/Organizador/${d.addr}` }}> organizador</Link>
+                                <Link to={{ pathname: `/Oraculo/${d.addr}` }}> oraculo</Link>
                                 {/* <ContratoApuestas drizzle={drizzle} drizzleState={drizzleState} contractAddress={addr}/> */}
                             </li>
                         })

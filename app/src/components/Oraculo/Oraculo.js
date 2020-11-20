@@ -1,15 +1,13 @@
 import React from "react";
-import EventItem from "./EventItem";
 
 import Apuesta from "../../contracts/Apuesta.json";
 
-class ContratoApuestas extends React.Component {
+class Oraculo extends React.Component {
     state = { dataKeyName: null , dataKeyEvents: null, dataKeyBetStatus: null, dataKeyWinner: null, amountToBet:0, selection:0};
 
 
-    handleChangeAmount = this.handleChangeAmount.bind(this);
-    handleChangeSelection = this.handleChangeSelection.bind(this);
-    handleSubmitBet = this.handleSubmitBet.bind(this);
+    handleCerrar = this.handleCerrar.bind(this);
+    handleAnunciar = this.handleAnunciar.bind(this);
 
     componentDidMount() {
       const { drizzle } = this.props;
@@ -33,49 +31,32 @@ class ContratoApuestas extends React.Component {
         this.addNewContract(contractAddress);
     }
 
-    handleChangeAmount(event) {
-      this.setState({amountToBet: event.target.value});
-      //console.log(event.target.value);
-    }
-
-    handleChangeSelection(event) {
-      this.setState({selection: event.target.value});
-      //console.log(event.target.value);
-    }
-
-    handleSubmitBet(event) {
-      console.log(this.state.amountToBet);
-      console.log(this.state.selection);
-      var state = this.props.drizzle.store.getState()
-      //console.log(this.props.drizzleState.accounts[0]);
+    handleCerrar(event){
       
       const { contractAddress } = this.props.props.match.params;
-      const stackId = this.props.drizzle.contracts["Apuesta "+contractAddress].methods.registerBid.cacheSend(this.state.selection, {from: this.props.drizzleState.accounts[0], value:this.state.amountToBet})
-
-      if (state.drizzleStatus.initialized) {
-        // Use the stackId to display the transaction status.
-        if (state.transactionStack[stackId]) {
-          const txHash = state.transactionStack[stackId];
-          //console.log(state.transactions[txHash].status);
-          return state.transactions[txHash].status
-        }
-      }
+      this.props.drizzle.contracts["Apuesta "+contractAddress].methods.cerrarApuestas.cacheSend({from: this.props.drizzleState.accounts[0]})
+    }
+    handleAnunciar(id){
+    
+      const { contractAddress } = this.props.props.match.params;
+      this.props.drizzle.contracts["Apuesta "+contractAddress].methods.recibirEventoDelOraculo.cacheSend(id, {from: this.props.drizzleState.accounts[0]})
+      
     }
 
     getBetStatus(num){
       switch(num){
         case "0":
-          return "Apuestas abiertas"
+          return "Apuestas abiertas";
         case "1":
-          return "Apuestas cerradas"
+          return "Apuestas cerradas";
         case "2":
-          return "Procesando apuestas"
+          return "Procesando apuestas";
         case "3":
-          return "Pagos realizados"
+          return "Pagos realizados";
         case "4":
-          return "Pagos no realizados"
-        default:
-          return "Opa, cosas raras"
+          return "Pagos no realizados";
+          default:
+              return "Opa, cosas raras. El enum no tiene map.";
       }
     }
 
@@ -102,13 +83,6 @@ class ContratoApuestas extends React.Component {
        }, 100)
       
     }
-
-    
-//    render() {
-//      //console.log(this.props.drizzle.contracts.Apuesta.address);
-//      const { Apuesta } = this.props.drizzleState.contracts;
-//      const contractName = Apuesta.nombre[this.state.dataKeyName]; // if displayData (an object) exists, then we can display the value below
-//      const contractEvents = Apuesta.getEvents[this.state.dataKeyEvents]; // if displayData (an object) exists, then we can display the value below
 
     render() {
       
@@ -137,43 +111,18 @@ class ContratoApuestas extends React.Component {
             <h2>{contractName && contractName.value}</h2>
             <h5>Address: {this.props.props.match.params.contractAddress}</h5>
             <h5>Estado de la apuesta: {contractStatus && this.getBetStatus(contractStatus.value)}</h5>
-            {//{ contractWinner && 
-            //<h5>Evento ganador:{contractWinner.value}</h5>
-            //}
+            { contractStatus && contractStatus.value === "0" &&
+                <button onClick={this.handleCerrar}>Cerrar apuestas</button>
             }
-            <h5>Total apostado:
-            {contractEvents && contractEvents.value.reduce((total, value) => {
-              // if the value is an array then recursively call reduce
-              // if the value is not an array then just concat our value
-              return total+=value.cantidadApostada;
-            }, 0)
-            } Gwei</h5>
-            {contractEvents &&
+            { contractStatus && contractStatus.value === "1" &&
+                <h5>Anunciar evento ganador</h5>}
+
+            {contractStatus && contractStatus.value === "1" && contractEvents &&
                 //console.log(contractEvents)
                 contractEvents.value.map((e, i) => (
-                    <EventItem e = {e} key={i}/>
+                <button onClick={()=>this.handleAnunciar(e.id)}>{e.id}</button>
                 ))
             }
-            <h3>Apostar</h3>
-
-              {contractStatus && contractStatus.value === "0" && 
-              <div>
-              <input type="text" style={{"margin" : "5px"}} value={this.state.amountToBet} onChange={this.handleChangeAmount}/>
-              <select value={this.state.selection} style={{"margin" : "5px"}} onChange={this.handleChangeSelection}>
-              {contractEvents &&
-                //console.log(contractEvents)
-                contractEvents.value.map((e, i) => (
-                    <option value={e.id} key={i}>{e.id}</option>
-                ))}
-              </select>
-              <input type="submit" style={{"margin" : "5px"}} value="Submit" onClick={this.handleSubmitBet}/>
-              </div>
-              }
-              {contractStatus && contractStatus.value !== "0" && 
-              <div>
-              Apuestas cerradas
-              </div>
-              }
 
             {/*<ContractForm 
               drizzle = {this.props.drizzle}
@@ -189,34 +138,4 @@ class ContratoApuestas extends React.Component {
     }
    }
    
-   export default ContratoApuestas
-
-/* 
-export default ({ drizzle, drizzleState }) => {
-  // destructure drizzle and drizzleState from props
-  return (
-    <div className="App">
-        <h2>
-            <ContractData
-                drizzle={drizzle}
-                drizzleState={drizzleState}
-                contract="Apuesta"
-                method="nombre"
-            />
-        </h2>
-        <p>
-          <strong>Eventos: </strong>
-        </p>
-        <div className="idEvento">
-        <ContractData
-                drizzle={drizzle}
-                drizzleState={drizzleState}
-                contract="Apuesta"
-                method="getEvents"
-            />
-        </div>
-        
-    </div>
-  );
-};
-*/
+   export default Oraculo;

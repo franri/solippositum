@@ -7,8 +7,12 @@ import "./Apuesta.sol";
 contract ApuestaManager {
 
   
+  struct Dupla {
+    string name;
+    address addr;
+  }
 
-  address[] public apuestas;
+  Dupla[] public apuestas;
   uint256 public apuestasLength;
 
   constructor() public {
@@ -17,11 +21,14 @@ contract ApuestaManager {
 
   function createApuesta(string memory name, uint256[][] memory outerEvents, address oraculoExterno) public {
     Apuesta a = new Apuesta(name, outerEvents, oraculoExterno);
-    apuestas.push(address(a));
+    Dupla memory d;
+    d.name = name;
+    d.addr = address(a);
+    apuestas.push(d);
     apuestasLength++;
   }
 
-  function getApuestas() public view returns ( address[] memory ){
+  function getApuestas() public view returns ( Dupla[] memory ){
     return apuestas;
   }
 }

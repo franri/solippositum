@@ -10,6 +10,8 @@ import drizzleOptions from "./drizzleOptions";
 //import MyComponent from "./MyComponent";
 import ContratoApuestas from "./components/ContratoApuestas/ContratoApuestas";
 import ApuestaManager from './components/ApuestaManager/ApuestaManager'
+import Oraculo from './components/Oraculo/Oraculo'
+import Organizador from './components/Organizador/Organizador'
 import Banner from './components/Banner/Banner'
 import "./App.css";
 
@@ -33,6 +35,8 @@ const App = () => {
               <Router>
                 <Switch>
                   <Route path="/Apuesta/:contractAddress"  render={(props) => <ContratoApuestas props={props} drizzle={drizzle} drizzleState={drizzleState}/>}/>
+                  <Route path="/Oraculo/:contractAddress"  render={(props) => <Oraculo props={props} drizzle={drizzle} drizzleState={drizzleState}/>}/>
+                  <Route path="/Organizador/:contractAddress"  render={(props) => <Organizador props={props} drizzle={drizzle} drizzleState={drizzleState}/>}/>                  
                   <Route path={["/","/ApuestaManager"]}>
                     <ApuestaManager drizzle={drizzle} drizzleState={drizzleState}/>
                   </Route>

@@ -1,7 +1,6 @@
 //import ComplexStorage from "./contracts/ComplexStorage.json";
 //import SimpleStorage from "./contracts/SimpleStorage.json";
 //import TutorialToken from "./contracts/TutorialToken.json";
-import Apuesta from "./contracts/Apuesta.json"
 import ApuestaManager from "./contracts/ApuestaManager.json"
 
 const options = {

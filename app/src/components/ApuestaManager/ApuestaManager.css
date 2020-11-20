@@ -29,10 +29,18 @@
 }
 .addresses>ul>li:hover {
     transform: scaleX(1.1) scaleY(1.1);
+    
 }
-.addresses>ul>li a {
+.addresses>ul>li>a {
     color: var(--white);
     text-decoration: none; /* no underline */
+  }
+  .addresses>ul>li>span {
+    color: var(--white);
+    font-size: 2em;
+  }
+.addresses>ul>li>a:hover {
+    font-style: italic;
   }
 
 .newBidForm {
