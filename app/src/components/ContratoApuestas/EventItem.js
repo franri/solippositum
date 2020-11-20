@@ -4,7 +4,7 @@ import React from "react";
 class EventItem extends React.Component {   
   getStyle = () => {
     return {
-      background: '#eeeeee',
+      //background: '#eeeeee',
       padding: '10px',
       margin: '5px',
       rounded: "10%"

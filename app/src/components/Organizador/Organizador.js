@@ -38,11 +38,19 @@ class Organizador extends React.Component {
     }
     handlePagar(event){
       //console.log(this.props.drizzleState.accounts[0]);
-      console.log(this.props);
-      return;
+      //console.log(this.props);
+      //return;
+      var state = this.props.drizzle.store.getState()
       const { contractAddress } = this.props.props.match.params;
-      this.props.drizzle.contracts["Apuesta "+contractAddress].methods.recibirEventoDelOraculo.cacheSend({from: this.props.drizzleState.accounts[0]})
-      
+      const stackId = this.props.drizzle.contracts["Apuesta "+contractAddress].methods.deposit.cacheSend({from: this.props.drizzleState.accounts[0], value:this.state.monto})
+      if (state.drizzleStatus.initialized) {
+        // Use the stackId to display the transaction status.
+        if (state.transactionStack[stackId]) {
+          const txHash = state.transactionStack[stackId];
+          //console.log(state.transactions[txHash].status);
+          return state.transactions[txHash].status
+        }
+      }
     }
 
     getBetStatus(num){

@@ -34,7 +34,7 @@ class Oraculo extends React.Component {
     handleCerrar(event){
       
       const { contractAddress } = this.props.props.match.params;
-      this.props.drizzle.contracts["Apuesta "+contractAddress].methods.cerrarApuestas.cacheSend({from: this.props.drizzleState.accounts[0]})
+      this.props.drizzle.contracts["Apuesta "+contractAddress].methods.cerrarApuestas.cacheSend({from: this.props.drizzleState.accounts[0]})//
     }
     handleAnunciar(id){
     

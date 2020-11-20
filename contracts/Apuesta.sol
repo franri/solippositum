@@ -42,7 +42,7 @@ contract Apuesta {
 
 
   modifier onlyOrganizador() {
-      require(msg.sender == organizador, "Sólo un oráculo puede realizar esta tarea.");
+      require(msg.sender == organizador, "Sólo un organizador puede realizar esta tarea.");
       _;
     }
 
@@ -72,9 +72,10 @@ contract Apuesta {
       createEvent(i, outerEvents[i]);
     }
     nombre = name;
-    organizador = msg.sender;
+    organizador = tx.origin;//msg.sender; //
     oraculo = oraculoExterno;
     estado = Estado.ApuestasAbiertas;
+    plataDelOrganizador = 0;
   }
 
   function createEvent(uint256 i, uint256[] memory outerEvent) private {
@@ -116,7 +117,7 @@ contract Apuesta {
 
   function recibirEventoDelOraculo(uint256 eventoGanadorId) public onlyOraculo onlyApuestasCerradas {
     eventoGanador = eventoGanadorId;
-    if ( plataDelOrganizador > plataRequerida ) {
+    if ( plataDelOrganizador >= plataRequerida ) {
       payBack();
       estado = Estado.PagosRealizados;
     } else {

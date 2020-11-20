@@ -97,18 +97,11 @@ class ContratoApuestas extends React.Component {
         let dataKeyEvents = contract.methods["getEvents"].cacheCall(); // declare this call to be cached and synchronized
         let dataKeyBetStatus = contract.methods["estado"].cacheCall(); // declare this call to be cached and synchronized
         this.setState({ dataKeyName:dataKeyName, dataKeyEvents:dataKeyEvents, dataKeyBetStatus:dataKeyBetStatus});
-        //let dataKeyWinner = contract.methods["eventoGanador"].cacheCall(); // declare this call to be cached and synchronized
-        //this.setState({ dataKeyName:dataKeyName, dataKeyEvents:dataKeyEvents, dataKeyBetStatus:dataKeyBetStatus, dataKeyWinner:dataKeyWinner });
+        let dataKeyWinner = contract.methods["eventoGanador"].cacheCall(); // declare this call to be cached and synchronized
+        this.setState({ dataKeyName:dataKeyName, dataKeyEvents:dataKeyEvents, dataKeyBetStatus:dataKeyBetStatus, dataKeyWinner:dataKeyWinner });
        }, 100)
       
     }
-
-    
-//    render() {
-//      //console.log(this.props.drizzle.contracts.Apuesta.address);
-//      const { Apuesta } = this.props.drizzleState.contracts;
-//      const contractName = Apuesta.nombre[this.state.dataKeyName]; // if displayData (an object) exists, then we can display the value below
-//      const contractEvents = Apuesta.getEvents[this.state.dataKeyEvents]; // if displayData (an object) exists, then we can display the value below
 
     render() {
       
@@ -126,7 +119,7 @@ class ContratoApuestas extends React.Component {
       const contractName = contract.nombre && contract.nombre[this.state.dataKeyName]; // if displayData (an object) exists, then we can display the value below
       const contractEvents = contract.getEvents && contract.getEvents[this.state.dataKeyEvents]; // if displayData (an object) exists, then we can display the value below
       const contractStatus = contract.estado && contract.estado[this.state.dataKeyBetStatus]; // if displayData (an object) exists, then we can display the value below
-      //const contractWinner = contract.eventoGanador && contract.eventoGanador[this.state.dataKeyWinner]; // if displayData (an object) exists, then we can display the value below
+      const contractWinner = contract.eventoGanador && contract.eventoGanador[this.state.dataKeyWinner]; // if displayData (an object) exists, then we can display the value below
       
       //console.log({from:this.props.drizzleState});
       //console.log(Apuesta);
@@ -137,15 +130,16 @@ class ContratoApuestas extends React.Component {
             <h2>{contractName && contractName.value}</h2>
             <h5>Address: {this.props.props.match.params.contractAddress}</h5>
             <h5>Estado de la apuesta: {contractStatus && this.getBetStatus(contractStatus.value)}</h5>
-            {//{ contractWinner && 
-            //<h5>Evento ganador:{contractWinner.value}</h5>
-            //}
+            { contractWinner && 
+            contractWinner.value !=0 && 
+              <h5>Evento ganador: {contractWinner.value}</h5>
+            
             }
             <h5>Total apostado:
             {contractEvents && contractEvents.value.reduce((total, value) => {
               // if the value is an array then recursively call reduce
               // if the value is not an array then just concat our value
-              return total+=value.cantidadApostada;
+              return total+=parseInt(value.cantidadApostada);
             }, 0)
             } Gwei</h5>
             {contractEvents &&
