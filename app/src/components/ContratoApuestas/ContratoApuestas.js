@@ -4,7 +4,7 @@ import EventItem from "./EventItem";
 import Apuesta from "../../contracts/Apuesta.json";
 
 class ContratoApuestas extends React.Component {
-    state = { dataKeyName: null , dataKeyEvents: null, amountToBet:0, selection:0};
+    state = { dataKeyName: null , dataKeyEvents: null, dataKeyBetStatus: null, dataKeyWinner: null, amountToBet:0, selection:0};
 
 
     handleChangeAmount = this.handleChangeAmount.bind(this);
@@ -17,7 +17,10 @@ class ContratoApuestas extends React.Component {
       const contract = drizzle.contracts["Apuesta "+contractAddress];
       let dataKeyName = contract.methods["nombre"].cacheCall(); // declare this call to be cached and synchronized
       let dataKeyEvents = contract.methods["getEvents"].cacheCall(); // declare this call to be cached and synchronized
-      this.setState({ dataKeyName, dataKeyEvents });
+      let dataKeyBetStatus = contract.methods["estado"].cacheCall(); // declare this call to be cached and synchronized
+      this.setState({ dataKeyName:dataKeyName, dataKeyEvents:dataKeyEvents, dataKeyBetStatus:dataKeyBetStatus});
+      //let dataKeyWinner = contract.methods["eventoGanador"].cacheCall(); // declare this call to be cached and synchronized
+      //this.setState({ dataKeyName:dataKeyName, dataKeyEvents:dataKeyEvents, dataKeyBetStatus:dataKeyBetStatus, dataKeyWinner:dataKeyWinner });
       //const { Apuesta } = this.props.drizzleState.contracts;
     }
     constructor(props) {
@@ -59,6 +62,21 @@ class ContratoApuestas extends React.Component {
       }
     }
 
+    getBetStatus(num){
+      switch(num){
+        case "0":
+          return "Apuestas abiertas"
+        case "1":
+          return "Apuestas cerradas"
+        case "2":
+          return "Procesando apuestas"
+        case "3":
+          return "Pagos realizados"
+        case "4":
+          return "Pagos no realizados"
+      }
+    }
+
     addNewContract(newAddress){
       let contractName = "Apuesta " + newAddress;
       const { drizzle  } = this.props;
@@ -70,15 +88,19 @@ class ContratoApuestas extends React.Component {
     
       // Using the Drizzle context object
       drizzle.addContract(contractConfig/*, events*/)
-      console.log("antes de timeout");
+      //console.log("antes de timeout");
       setTimeout(()=>{
         const contract = drizzle.contracts[contractName];
         let dataKeyName = contract.methods["nombre"].cacheCall(); // declare this call to be cached and synchronized
         let dataKeyEvents = contract.methods["getEvents"].cacheCall(); // declare this call to be cached and synchronized
-        this.setState({ dataKeyName, dataKeyEvents });
+        let dataKeyBetStatus = contract.methods["estado"].cacheCall(); // declare this call to be cached and synchronized
+        this.setState({ dataKeyName:dataKeyName, dataKeyEvents:dataKeyEvents, dataKeyBetStatus:dataKeyBetStatus});
+        //let dataKeyWinner = contract.methods["eventoGanador"].cacheCall(); // declare this call to be cached and synchronized
+        //this.setState({ dataKeyName:dataKeyName, dataKeyEvents:dataKeyEvents, dataKeyBetStatus:dataKeyBetStatus, dataKeyWinner:dataKeyWinner });
        }, 100)
       
     }
+
     
 //    render() {
 //      //console.log(this.props.drizzle.contracts.Apuesta.address);
@@ -93,22 +115,30 @@ class ContratoApuestas extends React.Component {
         return <p>Loading...</p>
       }
       const { contractAddress } = this.props.props.match.params;
-      console.log(contractAddress);
+      //console.log(contractAddress);
       const contract = drizzleState.contracts["Apuesta "+contractAddress];
-      console.log(contract);
+      //console.log(contract);
       if(!contract){
         return <p>Loading...</p>
       }
       const contractName = contract.nombre && contract.nombre[this.state.dataKeyName]; // if displayData (an object) exists, then we can display the value below
       const contractEvents = contract.getEvents && contract.getEvents[this.state.dataKeyEvents]; // if displayData (an object) exists, then we can display the value below
-
+      const contractStatus = contract.estado && contract.estado[this.state.dataKeyBetStatus]; // if displayData (an object) exists, then we can display the value below
+      //const contractWinner = contract.eventoGanador && contract.eventoGanador[this.state.dataKeyWinner]; // if displayData (an object) exists, then we can display the value below
+      
       //console.log({from:this.props.drizzleState});
       //console.log(Apuesta);
       //console.log(contractEvents);
+      //console.log(contractStatus);
       return (
         <div className="App">
             <h2>{contractName && contractName.value}</h2>
             <h5>Address: {this.props.props.match.params.contractAddress}</h5>
+            <h5>Estado de la apuesta: {contractStatus && this.getBetStatus(contractStatus.value)}</h5>
+            {//{ contractWinner && 
+            //<h5>Evento ganador:{contractWinner.value}</h5>
+            //}
+            }
             <h5>Total apostado:
             {contractEvents && contractEvents.value.reduce((total, value) => {
               // if the value is an array then recursively call reduce
@@ -123,16 +153,26 @@ class ContratoApuestas extends React.Component {
                 ))
             }
             <h3>Apostar</h3>
-            <div>
-              <input type="text" value={this.state.amountToBet} onChange={this.handleChangeAmount} />
-              <select value={this.state.selection} onChange={this.handleChangeSelection}>
+
+              {contractStatus && contractStatus.value === "0" && 
+              <div>
+              <input type="text" style={{"margin" : "5px"}} value={this.state.amountToBet} onChange={this.handleChangeAmount}/>
+              <select value={this.state.selection} style={{"margin" : "5px"}} onChange={this.handleChangeSelection}>
               {contractEvents &&
                 //console.log(contractEvents)
                 contractEvents.value.map((e, i) => (
                     <option value={e.id} key={i}>{e.id}</option>
                 ))}
               </select>
-              <input type="submit" value="Submit" onClick={this.handleSubmitBet}/>
+              <input type="submit" style={{"margin" : "5px"}} value="Submit" onClick={this.handleSubmitBet}/>
+              </div>
+              }
+              {contractStatus && contractStatus.value !== "0" && 
+              <div>
+              Apuestas cerradas
+              </div>
+              }
+
             {/*<ContractForm 
               drizzle = {this.props.drizzle}
               contract="Apuesta"
@@ -140,7 +180,7 @@ class ContratoApuestas extends React.Component {
               sendArgs={{from:this.props.drizzleState.accounts[0], value:this.state.amountToBet}}
               labels={["Evento"]}
             />*/}
-            </div>
+
             
         </div>
       )
